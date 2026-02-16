@@ -1,6 +1,7 @@
 package com.ai.mcp.client;
 
 import com.vaadin.flow.component.Composite;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.messages.MessageInput;
 import com.vaadin.flow.component.messages.MessageList;
 import com.vaadin.flow.component.messages.MessageListItem;
@@ -10,6 +11,7 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import com.vaadin.flow.theme.lumo.LumoUtility;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -26,12 +28,18 @@ public class ChatBotView extends Composite<VerticalLayout> {
 
     public ChatBotView(ChatService chatService) {
         this.chatService = chatService;
+        H2 title = new H2("Spring AI Chatbot");
+        title.addClassName(LumoUtility.FontWeight.EXTRABOLD);
+        getContent().add(title);
+
+        Hr line = new Hr();
+        line.setWidthFull();
+        getContent().add(line);
 
         //Create a scrolling MessageList
         messageList = new MessageList();
         var scroller = new Scroller(messageList);
         scroller.setHeightFull();
-//        scroller.scrollToTop();
         getContent().addAndExpand(scroller);
 
         //create a MessageInput and set a submit-listener
@@ -56,15 +64,12 @@ public class ChatBotView extends Composite<VerticalLayout> {
         //append a response message to the existing UI
         var userPrompt = submitEvent.getValue();
         var uiOptional = submitEvent.getSource().getUI();
-        var ui = uiOptional.orElse(null); //implementation via ifPresent also possible
+        uiOptional.ifPresent(ui -> chatService.chatStream(userPrompt, chatId)
+                .subscribe(token ->
+                        ui.access(() -> {
+                            responseMessage.appendText(token);
+                            ((Scroller) getContent().getComponentAt(2)).scrollToBottom();
+                        })));
 
-        if (ui != null) {
-            chatService.chatStream(userPrompt, chatId)
-                    .subscribe(token ->
-                            ui.access(() -> {
-                                        responseMessage.appendText(token);
-                                        ((Scroller)getContent().getComponentAt(0)).scrollToBottom();
-                                    }));
-        }
     }
 }

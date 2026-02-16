@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: mcp-client
+  ai:
+    openai:
+      api-key: ${GROQ_API_KEY}
+      base-url: https://api.groq.com/openai
+      chat:
+        options:
+          model: llama-3.1-8b-instant
+          temperature: 0.7
+    google:
+      genai.api-key:  ${GEN_API_KEY}
+
+vaadin:
+  launch-browser: true

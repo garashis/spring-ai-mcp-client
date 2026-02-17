@@ -17,9 +17,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 @PageTitle("Chat Bot")
+@Menu(title = "Chatbot", order = 0)
 @Route("")
 @RouteAlias("chat-bot")
-@Menu(order = 0)
 public class ChatBotView extends Composite<VerticalLayout> {
 
     private final ChatService chatService;
@@ -28,16 +28,10 @@ public class ChatBotView extends Composite<VerticalLayout> {
 
     public ChatBotView(ChatService chatService) {
         this.chatService = chatService;
-        H2 title = new H2("Spring AI Chatbot");
-        title.addClassName(LumoUtility.FontWeight.EXTRABOLD);
-        getContent().add(title);
-
-        Hr line = new Hr();
-        line.setWidthFull();
-        getContent().add(line);
 
         //Create a scrolling MessageList
         messageList = new MessageList();
+        messageList.setMarkdown(true);
         var scroller = new Scroller(messageList);
         scroller.setHeightFull();
         getContent().addAndExpand(scroller);
@@ -52,12 +46,13 @@ public class ChatBotView extends Composite<VerticalLayout> {
 
     private void onSubmit(MessageInput.SubmitEvent submitEvent) {
         //create and handle a prompt message
-        var promptMessage = new MessageListItem(submitEvent.getValue(), Instant.now(), "User");
+        var promptMessage = new MessageListItem(submitEvent.getValue(), Instant.now(), "You");
         promptMessage.setUserColorIndex(0);
+        promptMessage.addClassNames("current-user");
         messageList.addItem(promptMessage);
 
         //create and handle the response message
-        var responseMessage = new MessageListItem("", Instant.now(), "Bot");
+        var responseMessage = new MessageListItem("", Instant.now(), "AI");
         responseMessage.setUserColorIndex(1);
         messageList.addItem(responseMessage);
 
@@ -68,7 +63,7 @@ public class ChatBotView extends Composite<VerticalLayout> {
                 .subscribe(token ->
                         ui.access(() -> {
                             responseMessage.appendText(token);
-                            ((Scroller) getContent().getComponentAt(2)).scrollToBottom();
+                            ((Scroller) getContent().getComponentAt(0)).scrollToBottom();
                         })));
 
     }

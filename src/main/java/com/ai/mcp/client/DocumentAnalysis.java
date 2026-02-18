@@ -20,6 +20,7 @@ import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.sax.BodyContentHandler;
+import org.jspecify.annotations.NonNull;
 import org.springframework.ai.chat.client.ChatClient;
 
 import java.io.InputStream;
@@ -56,21 +57,10 @@ public class DocumentAnalysis extends VerticalLayout {
     private void buildView() {
         var modeSelector = new RadioButtonGroup<String>();
 
-        InMemoryUploadHandler inMemoryHandler = UploadHandler.inMemory(
-                (metadata, data) -> {
-                    // Get other information about the file.
-                    String fileName = metadata.fileName();
-                    String mimeType = metadata.contentType();
-                    long contentLength = metadata.contentLength();
-
-                    // Do something with the file data...
-                    parseFile(data, modeSelector.getValue());
-                });
-        Upload upload = new Upload(inMemoryHandler);
         var heading = new H1("Document Analysis Bot");
         heading.addClassName(LumoUtility.FontSize.XLARGE);
 
-        var header = new HorizontalLayout(heading, upload);
+        var header = new HorizontalLayout(heading, getUpload(modeSelector));
         header.setAlignItems(Alignment.BASELINE);
         header.addClassName(LumoUtility.FlexWrap.WRAP);
 
@@ -81,6 +71,20 @@ public class DocumentAnalysis extends VerticalLayout {
 
         add(header, modeSelector, output);
 
+    }
+
+    private @NonNull Upload getUpload(RadioButtonGroup<String> modeSelector) {
+        InMemoryUploadHandler inMemoryHandler = UploadHandler.inMemory(
+                (metadata, data) -> {
+                    // Get other information about the file.
+                    String fileName = metadata.fileName();
+                    String mimeType = metadata.contentType();
+                    long contentLength = metadata.contentLength();
+
+                    // Do something with the file data...
+                    parseFile(data, modeSelector.getValue());
+                });
+        return new Upload(inMemoryHandler);
     }
 
     private void parseFile(byte[] data, String mode) {
@@ -111,9 +115,7 @@ public class DocumentAnalysis extends VerticalLayout {
             .user("Text to summarize: " + content)
             .stream()
             .content()
-            .subscribe(token -> {
-                ui.access(() -> response.appendContent(token));
-            });
+            .subscribe(token -> ui.access(() -> response.appendContent(token)));
 
     }
 }

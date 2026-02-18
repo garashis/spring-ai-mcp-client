@@ -14,8 +14,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import org.springframework.ai.chat.client.ChatClient;
 
-//@Menu(title = "Sentiment Analysis", order = 4)
-//@Route("sentiment-analysis")
+@Menu(title = "Sentiment Analysis", order = 4)
+@Route("sentiment-analysis")
 public class SentimentAnalysis extends VerticalLayout {
 
     private final ReviewRepository repository;

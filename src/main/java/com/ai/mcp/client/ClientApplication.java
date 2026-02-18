@@ -1,5 +1,7 @@
 package com.ai.mcp.client;
 
+import com.vaadin.flow.component.dependency.StyleSheet;
+import com.vaadin.flow.theme.lumo.Lumo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -12,6 +14,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @PageTitle("AI in Vaadin")
 @SpringBootApplication
 @Push
+@StyleSheet(Lumo.STYLESHEET)
+@StyleSheet(Lumo.UTILITY_STYLESHEET)
+//@StyleSheet("styles.css")
 public class ClientApplication implements AppShellConfigurator {
 
 	public static void main(String[] args) {

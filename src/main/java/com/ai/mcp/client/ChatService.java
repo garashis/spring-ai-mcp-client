@@ -37,11 +37,11 @@ public class ChatService {
         chatClient = chatClientBuilder
                 .defaultAdvisors(chatMemoryAdvisor, new SimpleLoggerAdvisor())
                 .defaultToolCallbacks(tools)
-
                 .build();
 
         //set logging level
         mcpAsyncClients.forEach(mcpAsyncClient -> mcpAsyncClient.setLoggingLevel(McpSchema.LoggingLevel.DEBUG).block());
+//        mcpAsyncClients.forEach(mcpAsyncClient -> System.out.println(mcpAsyncClient.getClientCapabilities()));
     }
 
     public Flux<String> chatStream(String userInput, String chatId) {

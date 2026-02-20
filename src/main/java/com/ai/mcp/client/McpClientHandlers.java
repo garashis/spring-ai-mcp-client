@@ -6,8 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springaicommunity.mcp.annotation.McpLogging;
 import org.springaicommunity.mcp.annotation.McpProgress;
 import org.springaicommunity.mcp.annotation.McpSampling;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -17,7 +20,7 @@ import static io.modelcontextprotocol.spec.McpSchema.*;
 @Component
 @RequiredArgsConstructor
 public class McpClientHandlers {
-
+    private final ChatClient.Builder chatClientBuilder;
     @McpLogging(clients = "server1")
     public Mono<Void> handleLoggingMessageMono(LoggingMessageNotification notification) {
         System.out.println("handleLoggingMessage log: " + notification.level() +
@@ -31,18 +34,29 @@ public class McpClientHandlers {
         return Mono.empty();
 
     }
-    
 
-    //@McpSampling(clients = "my-mcp-client")
-    public CreateMessageResult handleSamplingRequest(CreateMessageRequest request) {
+    @McpSampling(clients = "server1")
+    public Mono<CreateMessageResult> handleSamplingRequest(CreateMessageRequest request) {
         // Process the request and generate a response
-        String response = "This is the response from server";
+        // Build the chat client
+        ChatClient chatClient = chatClientBuilder
+                //.defaultAdvisors(new SimpleLoggerAdvisor())
+                .defaultSystem(request.systemPrompt())
+                .build();
+        String response = "My epic poem";
+//        String response = chatClient.prompt()
+//                .user(request.messages().get(0).content().toString())
+//                //.stream()
+//                .call()
+//                .content();
 
-        return CreateMessageResult.builder()
+        //response.col
+
+        return Mono.just(CreateMessageResult.builder()
                 .role(Role.ASSISTANT)
                 .content(new TextContent(response))
                 .model("gpt-4")
-                .build();
+                .build());
     }
 
     @McpProgress(clients = "server1")

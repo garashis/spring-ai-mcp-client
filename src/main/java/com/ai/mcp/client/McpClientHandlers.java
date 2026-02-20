@@ -17,27 +17,15 @@ import static io.modelcontextprotocol.spec.McpSchema.*;
 @Component
 @RequiredArgsConstructor
 public class McpClientHandlers {
-    private List<McpAsyncClient> mcpAsyncClients;
 
-    public McpClientHandlers(List<McpAsyncClient> mcpAsyncClients){
-        System.out.println("handleLoggingMessage const");
-        mcpAsyncClients.forEach(mcpAsyncClient -> mcpAsyncClient.setLoggingLevel(McpSchema.LoggingLevel.DEBUG).block());
-    }
-
-    @McpLogging(clients = {"server1"})
+    @McpLogging(clients = "server1")
     public Mono<Void> handleLoggingMessageMono(LoggingMessageNotification notification) {
         System.out.println("handleLoggingMessage log: " + notification.level() +
                 " - " + notification.data());
         return Mono.empty();
     }
 
-    //@McpLogging(clients = {"my-mcp-client", "server1", "my-mcp-client - server1", "my-mcp-client-server1"})
-    public void handleLoggingMessageVoid(LoggingMessageNotification notification) {
-        System.out.println("handleLoggingMessageVoid log: " + notification.level() +
-                " - " + notification.data());
-    }
-
-    @McpLogging(clients = {"my-mcp-client", "server1", "my-mcp-client - server1", "my-mcp-client-server1"})
+    @McpLogging(clients = "server1")
     public Mono<Void>  handleLoggingMessageWithParams(LoggingLevel level, String logger, String data) {
         System.out.println("handleLoggingMessageWithParams log: " + data);
         return Mono.empty();

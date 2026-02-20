@@ -1,19 +1,30 @@
 package com.ai.mcp.client;
 
+import io.modelcontextprotocol.client.McpAsyncClient;
+import io.modelcontextprotocol.spec.McpSchema;
+import lombok.RequiredArgsConstructor;
 import org.springaicommunity.mcp.annotation.McpLogging;
 import org.springaicommunity.mcp.annotation.McpProgress;
 import org.springaicommunity.mcp.annotation.McpSampling;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 import static io.modelcontextprotocol.spec.McpSchema.*;
 
 @Component
+@RequiredArgsConstructor
 public class McpClientHandlers {
+    private List<McpAsyncClient> mcpAsyncClients;
 
-    private final String[] MY_MCP_CLIENT_SERVER = {"my-mcp-client - server1"};
+    public McpClientHandlers(List<McpAsyncClient> mcpAsyncClients){
+        System.out.println("handleLoggingMessage const");
+        mcpAsyncClients.forEach(mcpAsyncClient -> mcpAsyncClient.setLoggingLevel(McpSchema.LoggingLevel.DEBUG).block());
+    }
 
-    @McpLogging(clients = {"my-mcp-client", "server1", "my-mcp-client - server1", "my-mcp-client-server1"})
+    @McpLogging(clients = {"server1"})
     public Mono<Void> handleLoggingMessageMono(LoggingMessageNotification notification) {
         System.out.println("handleLoggingMessage log: " + notification.level() +
                 " - " + notification.data());

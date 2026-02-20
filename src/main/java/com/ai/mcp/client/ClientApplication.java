@@ -2,6 +2,10 @@ package com.ai.mcp.client;
 
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.theme.lumo.Lumo;
+import io.modelcontextprotocol.client.McpAsyncClient;
+import io.modelcontextprotocol.spec.McpSchema;
+import org.springframework.ai.mcp.customizer.McpAsyncClientCustomizer;
+import org.springframework.ai.mcp.customizer.McpSyncClientCustomizer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -10,6 +14,7 @@ import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.router.PageTitle;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 @PageTitle("AI in Vaadin")
 @SpringBootApplication

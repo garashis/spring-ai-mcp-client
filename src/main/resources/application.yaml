@@ -33,6 +33,8 @@ spring:
       genai.api-key:  ${GEN_API_KEY}
     mcp:
       client:
+        logging:
+          level: debug
         type: ASYNC
         name: my-mcp-client
         initialized: true

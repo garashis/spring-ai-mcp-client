@@ -12,8 +12,14 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import io.modelcontextprotocol.client.McpAsyncClient;
+import io.modelcontextprotocol.client.McpSyncClient;
+import io.modelcontextprotocol.spec.McpSchema;
+import org.springframework.ai.mcp.McpConnectionInfo;
+import org.springframework.ai.tool.ToolCallbackProvider;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @PageTitle("Chat Bot")
@@ -27,6 +33,7 @@ public class ChatBotView extends Composite<VerticalLayout> {
     private final String chatId = UUID.randomUUID().toString();
 
     public ChatBotView(ChatService chatService) {
+
         this.chatService = chatService;
 
         //Create a scrolling MessageList

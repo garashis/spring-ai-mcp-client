@@ -22,6 +22,7 @@ public class MainLayout extends AppLayout {
     public MainLayout() {
         UI.getCurrent().setLocale(Locale.ENGLISH);
 
+        // Page Header/Nav Bar
         var head = new HorizontalLayout();
         head.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         head.add(new DrawerToggle());
@@ -29,24 +30,27 @@ public class MainLayout extends AppLayout {
 
         addToNavbar(head);
 
+        // Sidebar to display menu items
         var sideBar = new VerticalLayout();
         var links = new VerticalLayout();
         links.setMargin(false);
 
+        // Populate Side bar with menu items
         MenuConfiguration.getMenuEntries().forEach(menuEntry -> {
             links.add(new RouterLink(menuEntry.title(), menuEntry.menuClass()));
         });
+        sideBar.addAndExpand(links);
 
+        // Add Toggle button to switch between dark and light theme
         var themeToggle = new Checkbox("Dark theme");
 
         themeToggle.addValueChangeListener(e -> {
             var js = "document.documentElement.setAttribute('theme', $0)";
             getElement().executeJs(js, e.getValue() ? Lumo.DARK : Lumo.LIGHT);
         });
-
-        sideBar.addAndExpand(links);
         sideBar.add(themeToggle);
 
+        // Add Sidebar to page
         addToDrawer(sideBar);
     }
 }

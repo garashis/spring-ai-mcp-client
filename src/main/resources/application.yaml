@@ -31,8 +31,29 @@ spring:
           temperature: 0.7
     google:
       genai.api-key:  ${GEN_API_KEY}
-
+    mcp:
+      client:
+        type: ASYNC
+        name: my-mcp-client
+        initialized: true
+        streamable-http:
+          connections:
+            server1:
+              url: http://localhost:8081
+              endpoint: /mcp
 vaadin:
   launch-browser: true
   exclude-urls:
     - /h2-console
+
+
+logging:
+  level:
+    io:
+      modelcontextprotocol: TRACE
+    org:
+      springframework:
+        ai:
+          chat:
+            client:
+              advisor: DEBUG

@@ -2,17 +2,20 @@ package com.ai.mcp.client;
 
 import io.modelcontextprotocol.client.McpAsyncClient;
 import io.modelcontextprotocol.spec.McpSchema;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springaicommunity.mcp.annotation.McpLogging;
 import org.springaicommunity.mcp.annotation.McpProgress;
 import org.springaicommunity.mcp.annotation.McpSampling;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.google.genai.GoogleGenAiChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.modelcontextprotocol.spec.McpSchema.*;
@@ -20,11 +23,21 @@ import static io.modelcontextprotocol.spec.McpSchema.*;
 @Component
 @RequiredArgsConstructor
 public class McpClientHandlers {
-    private final ChatClient.Builder chatClientBuilder;
+//    private final ChatClient.Builder chatClientBuilder;
+    private final GoogleGenAiChatModel googleGenAiChatModel;
+
+    @Getter
+    private final List<String> messages = new ArrayList<>();
+    @Getter
+    private final List<LoggingMessageNotification> notifications = new ArrayList<>();
+
+
     @McpLogging(clients = "server1")
     public Mono<Void> handleLoggingMessageMono(LoggingMessageNotification notification) {
         System.out.println("handleLoggingMessage log: " + notification.level() +
                 " - " + notification.data());
+        messages.add(notification.data());
+        notifications.add(notification);
         return Mono.empty();
     }
 
@@ -39,16 +52,18 @@ public class McpClientHandlers {
     public Mono<CreateMessageResult> handleSamplingRequest(CreateMessageRequest request) {
         // Process the request and generate a response
         // Build the chat client
-        ChatClient chatClient = chatClientBuilder
+
+        ChatClient.Builder builder = ChatClient.builder(googleGenAiChatModel);
+        ChatClient chatClient = builder
                 //.defaultAdvisors(new SimpleLoggerAdvisor())
                 .defaultSystem(request.systemPrompt())
                 .build();
-        String response = "My epic poem";
-//        String response = chatClient.prompt()
-//                .user(request.messages().get(0).content().toString())
-//                //.stream()
-//                .call()
-//                .content();
+//        String response = "My epic poem";
+        String response = chatClient.prompt()
+                .user(request.messages().get(0).content().toString())
+                //.stream()
+                .call()
+                .content();
 
         //response.col
 

@@ -33,7 +33,7 @@ dependencies {
 //	implementation 'org.springframework.ai:spring-ai-starter-model-huggingface'
 	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
 	implementation 'org.springframework.ai:spring-ai-starter-mcp-client-webflux'
-//	implementation 'org.springframework.ai:spring-ai-starter-model-google-genai'
+	implementation 'org.springframework.ai:spring-ai-starter-model-google-genai'
 	implementation 'org.springframework.ai:spring-ai-starter-model-chat-memory-repository-jdbc'
 //	implementation 'org.springframework.ai:spring-ai-starter-vector-store-pinecone'
 //	implementation 'org.springframework.ai:spring-ai-starter-model-google-genai-embedding'

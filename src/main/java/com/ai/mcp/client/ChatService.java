@@ -7,6 +7,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -26,7 +27,7 @@ public class ChatService {
     @Autowired
     private ApplicationContext applicationContext;
 
-    public ChatService(ChatClient.Builder chatClientBuilder,
+    public ChatService(OpenAiChatModel openAiChatModel,
                        ChatMemory chatMemory, ToolCallbackProvider tools, List<McpAsyncClient> mcpAsyncClients) {
         // Add a memory advisor to the chat client
         var chatMemoryAdvisor = MessageChatMemoryAdvisor
@@ -34,7 +35,7 @@ public class ChatService {
                 .build();
 
         // Build the chat client
-        chatClient = chatClientBuilder
+        chatClient =  ChatClient.builder(openAiChatModel)
                 .defaultAdvisors(chatMemoryAdvisor, new SimpleLoggerAdvisor())
                 .defaultToolCallbacks(tools)
                 .build();

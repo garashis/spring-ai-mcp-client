@@ -1,72 +1,58 @@
 package com.ai.mcp.client;
 
 import com.vaadin.flow.component.Composite;
-import com.vaadin.flow.component.accordion.Accordion;
-import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.messages.MessageInput;
 import com.vaadin.flow.component.messages.MessageList;
 import com.vaadin.flow.component.messages.MessageListItem;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import com.vaadin.flow.theme.lumo.LumoUtility;
-import io.modelcontextprotocol.client.McpAsyncClient;
-import io.modelcontextprotocol.client.McpSyncClient;
-import io.modelcontextprotocol.spec.McpSchema;
-import org.springframework.ai.mcp.McpConnectionInfo;
-import org.springframework.ai.tool.ToolCallbackProvider;
 import reactor.core.publisher.Flux;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
-@PageTitle("Chat Bot")
-@Menu(title = "Chatbot", order = 0)
-@Route("")
-@RouteAlias("chat-bot")
-public class ChatBotView extends Composite<VerticalLayout> {
+@PageTitle("New Chat Bot")
+@Menu(title = "Chatbot", order = 10)
+@Route("/chat-bot-new")
+@RouteAlias("chat-bot-new")
+public class ChatBotViewNew extends Composite<SplitLayout> {
 
     private final ChatService chatService;
     private final McpClientHandlers mcpClientHandlers;
     private final MessageList messageList;
     private final String chatId = UUID.randomUUID().toString();
     private final TextArea textArea ;
-    private final Accordion accordion = new Accordion();
-    public ChatBotView(ChatService chatService, McpClientHandlers mcpClientHandlers) {
+    public ChatBotViewNew(ChatService chatService, McpClientHandlers mcpClientHandlers) {
         this.chatService = chatService;
         this.mcpClientHandlers = mcpClientHandlers;
-        mcpClientHandlers.getMessages().clear();
-        mcpClientHandlers.getNotifications().clear();
+
 
         //Create a scrolling MessageList
         messageList = new MessageList();
         messageList.setMarkdown(true);
         var scroller = new Scroller(messageList);
         scroller.setHeightFull();
-        getContent().addAndExpand(scroller);
+//        getContent().addToPrimary(scroller);
 
         //create a MessageInput and set a submit-listener
         var messageInput = new MessageInput();
         messageInput.addSubmitListener(this::onSubmit);
         messageInput.setWidthFull();
 
-        getContent().add(messageInput);
+        getContent().addToPrimary(scroller, messageInput);
 
-        textArea = new TextArea("MCP Server messages");
+        textArea = new TextArea();
         textArea.setMinRows(4);
-        textArea.setWidth("50%");
         textArea.setMaxRows(8);
         textArea.setReadOnly(true);
 
-        accordion.setWidth("50%");
-        var mcpMessageScroller = new Scroller(accordion);
-        mcpMessageScroller.setWidth("50%");
-        getContent().add(mcpMessageScroller);
+        getContent().addToSecondary(textArea);
     }
 
     private void onSubmit(MessageInput.SubmitEvent submitEvent) {
@@ -87,26 +73,16 @@ public class ChatBotView extends Composite<VerticalLayout> {
         uiOptional.ifPresent(ui -> {
 
             chatService.chatStream(userPrompt, chatId)
-                    .doOnComplete(() -> ui.access(() -> {
-//                        textArea.clear();
-//                        mcpClientHandlers.getMessages().forEach(message -> {textArea.setValue(textArea.getValue() + "\n" +message);});
-                        accordion.getChildren().forEach(accordion::remove);
-                        mcpClientHandlers.getNotifications().reversed().forEach(notification -> {
-                            accordion.add(notification.data(), new VerticalLayout(new Paragraph(notification.toString())));});
-                    }))
-
                 .subscribe(token ->
                         ui.access(() -> {
                             responseMessage.appendText(token);
-                            //Flux.fromIterable(mcpClientHandlers.getMessages()).subscribe(message -> ui.access(() -> textArea.setValue( "\n" +message)));
-                            ((Scroller) getContent().getComponentAt(0)).scrollToBottom();
+//                            ((Scroller) getContent().getPrimaryComponent().getChildren()).scrollToBottom();
                         }));
-//            Flux.fromIterable(mcpClientHandlers.getMessages()).subscribe(
-//                    message -> {
-//                        ui.access(() -> {textArea.setValue(textArea.getValue() + "\n" +message);});
-//
-//                    }
-//            );
+            Flux.fromIterable(mcpClientHandlers.getMessages()).subscribe(
+                    message -> {
+                        ui.access(() -> {textArea.setValue(textArea.getValue() + "\n" +message);});
+                    }
+            );
 
         });
 
